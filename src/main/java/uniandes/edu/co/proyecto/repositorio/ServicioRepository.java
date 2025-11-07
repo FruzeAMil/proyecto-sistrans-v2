@@ -69,8 +69,7 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
         "INNER JOIN Usuario_Servicio us ON s.idUsuarioServicio = us.idUsuarioServicio " +
         "INNER JOIN Usuario_Conductor uc ON s.idUsuarioConductor = uc.idUsuarioConductor " +
         "INNER JOIN Usuario u ON uc.idUsuario = u.idUsuario " +
-        "INNER JOIN Vehiculo v ON s.idVehiculo = v.idVehiculo " +
-        "WHERE us.idUsuario = :idUsuario",
+        "INNER JOIN Vehiculo v ON s.idVehiculo = v.idVehiculo ",
         nativeQuery = true)
     Collection<Object[]> darHistoricoServiciosPorUsuario(@Param("idUsuario") Long idUsuario);
 
