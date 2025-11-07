@@ -55,25 +55,29 @@ public interface UsuarioConductorRepository extends JpaRepository<UsuarioConduct
     @Query(value = "DELETE FROM USUARIO_CONDUCTOR WHERE id = :id", nativeQuery = true)
     void eliminarConductor(@Param("id") Long id);
 
-    /**
-     * RFC2 - Mostrar los 20 usuarios conductores que más servicios han prestado.
-    */
+    /* RFC2 - top 20 conductores que más servicios han prestado */
     @Query(value =
-        "SELECT * FROM ( " +
-        "  SELECT conductor_id, conductor_nombre, conductor_cedula, conductor_correo, conductor_celular, servicios_count, ultima_fecha_servicio " +
-        "  FROM VW_CONDUCTORES_SERVICIOS_COUNT " +
-        "  ORDER BY servicios_count DESC, ultima_fecha_servicio DESC " +
-        ") WHERE ROWNUM <= 20",
+        "SELECT uc.idUsuarioConductor, u.nombre, u.cedula, u.correo, u.celular, COUNT(s.idServicio) AS q_servicios " +
+        "FROM Usuario_Conductor uc " +
+        "INNER JOIN Usuario u ON uc.idUsuario = u.idUsuario " +
+        "LEFT JOIN Servicio s ON s.idUsuarioConductor = uc.idUsuarioConductor " +
+        "GROUP BY uc.idUsuarioConductor, u.nombre, u.cedula, u.correo, u.celular " +
+        "ORDER BY q_servicios DESC " +
+        "FETCH FIRST 20 ROWS ONLY",
         nativeQuery = true)
     Collection<Object[]> darTop20ConductoresMasServicios();
-
-    /**
-     * RFC3 - Total de dinero obtenido por un conductor para cada uno de sus vehículos, discriminado por tipo de servicio.
-     */
+    
+    /* RFC3 - ganancias por conductor por vehículo discriminado por servicio (filtrable por conductor) */
     @Query(value =
-        "SELECT conductor_id, conductor_nombre, vehiculo_id, vehiculo_placa, tipo_servicio, servicios_count, ingreso_bruto, comision_alpescab, ingreso_neto, total_bruto_por_vehiculo, total_comision_por_vehiculo, total_neto_por_vehiculo " +
-        "FROM VW_GANANCIAS_CONDUCTOR_VEHICULO_POR_SERVICIO " +
-        "WHERE conductor_id = :idConductor " +
-        "ORDER BY vehiculo_id, tipo_servicio",
+        "SELECT uc.idUsuarioConductor, v.idVehiculo, v.placa, v.marca, v.modelo, " +
+        "       COUNT(s.idServicio) AS cantidad_servicios, SUM(s.costoTotal) AS valor_total_servicios, SUM(s.costoTotal) * 0.6 AS valor_neto_conductor " +
+        "FROM Usuario_Conductor uc " +
+        "INNER JOIN Vehiculo v ON v.idUsuarioConductor = uc.idUsuarioConductor " +
+        "INNER JOIN Servicio s ON s.idVehiculo = v.idVehiculo AND s.idUsuarioConductor = uc.idUsuarioConductor " +
+        "WHERE uc.idUsuarioConductor = :idConductor " +
+        "GROUP BY uc.idUsuarioConductor, v.idVehiculo, v.placa, v.marca, v.modelo " +
+        "ORDER BY uc.idUsuarioConductor, v.idVehiculo",
         nativeQuery = true)
-    Collection<Object[]> darGananciasPorConductorVehiculoPorServicio(@Param("idConductor") Long idConductor);}
+    Collection<Object[]> darGananciasPorConductorVehiculoPorServicio(@Param("idConductor") Long idConductor);
+
+}

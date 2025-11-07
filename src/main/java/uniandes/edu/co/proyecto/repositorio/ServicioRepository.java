@@ -60,28 +60,35 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     @Query(value = "DELETE FROM SERVICIO WHERE id = :id", nativeQuery = true)
     void eliminarServicio(@Param("id") Long id);
 
-     /**
-     * RFC1 - Consultar el histórico de todos los servicios pedidos por un usuario de servicio.
-     */
-    @Query(value = "SELECT * FROM VW_HISTORICO_SERVICIOS_POR_USUARIO WHERE id_usuarioServicio = :idUsuarioServicio ORDER BY fecha DESC, hora_inicio DESC", nativeQuery = true)
-    Collection<Object[]> darHistoricoServiciosPorUsuario(@Param("idUsuarioServicio") Long idUsuarioServicio);
-
-    /**
-     * RFC4 - Mostrar la utilización de servicios en una ciudad durante un rango de fechas.
-     */
+    /* RFC1 - historial de servicios por usuario (usa el SQL del archivo RFC1 - parametrizado) */
     @Query(value =
-        "SELECT NVL(tarifa_nivel, 'SIN_TARIFA') AS nivel, " +
-        "       COUNT(*) AS servicios_count, " +
-        "       ROUND(COUNT(*) / SUM(COUNT(*)) OVER () * 100, 2) AS porcentaje " +
-        "FROM ( " +
-        "  SELECT fecha, tarifa_nivel FROM VW_USO_SERVICIOS_BASE " +
-        "  WHERE ciudad_id = :idCiudad " +
-        "    AND fecha BETWEEN TO_DATE(:fechaDesde, 'YYYY-MM-DD') AND TO_DATE(:fechaHasta, 'YYYY-MM-DD') " +
-        ") sub " +
-        "GROUP BY tarifa_nivel " +
-        "ORDER BY servicios_count DESC",
+        "SELECT s.*, " +
+        "       v.placa, v.marca, v.modelo, v.color, v.capacidadPasajeros, v.tipoVehiculo, v.nivel, " +
+        "       uc.idUsuarioConductor, u.nombre AS nombreConductor, u.cedula AS cedulaConductor, u.correo AS correoConductor, u.celular AS celularConductor " +
+        "FROM Servicio s " +
+        "INNER JOIN Usuario_Servicio us ON s.idUsuarioServicio = us.idUsuarioServicio " +
+        "INNER JOIN Usuario_Conductor uc ON s.idUsuarioConductor = uc.idUsuarioConductor " +
+        "INNER JOIN Usuario u ON uc.idUsuario = u.idUsuario " +
+        "INNER JOIN Vehiculo v ON s.idVehiculo = v.idVehiculo " +
+        "WHERE us.idUsuario = :idUsuario",
+        nativeQuery = true)
+    Collection<Object[]> darHistoricoServiciosPorUsuario(@Param("idUsuario") Long idUsuario);
+
+    /* RFC4 - utilización de servicios en ciudad en rango de fechas (según archivo) */
+    @Query(value =
+        "SELECT c.nombre AS ciudad, t.tipoServicio, t.nivel, COUNT(s.idServicio) AS cantidad_servicios, " +
+        "       ROUND(100.0 * COUNT(s.idServicio) / SUM(COUNT(s.idServicio)) OVER (), 2) AS porcentaje, " +
+        "       SUM(s.costoTotal) AS valor_total " +
+        "FROM Servicio s " +
+        "INNER JOIN Vehiculo v ON s.idVehiculo = v.idVehiculo " +
+        "INNER JOIN Ciudad c ON v.idCiudadExpedicion = c.idCiudad " +
+        "INNER JOIN Tarifa t ON s.idTarifa = t.idTarifa " +
+        "WHERE c.idCiudad = :idCiudad " +
+        "  AND s.fechaInicio BETWEEN :fechaInicio AND :fechaFin " +
+        "GROUP BY c.nombre, t.tipoServicio, t.nivel " +
+        "ORDER BY cantidad_servicios DESC",
         nativeQuery = true)
     Collection<Object[]> darUsoServiciosPorCiudadYRango(@Param("idCiudad") Integer idCiudad,
-                                                       @Param("fechaDesde") String fechaDesde,
-                                                       @Param("fechaHasta") String fechaHasta);
+                                                       @Param("fechaInicio") String fechaInicio,
+                                                       @Param("fechaFin") String fechaFin);
 }
