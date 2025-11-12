@@ -15,7 +15,8 @@ public class Punto {
     public Punto() {;}
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
     private Long id;
 
     private String direccion;
@@ -27,7 +28,7 @@ public class Punto {
     private Integer orden;
 
     @ManyToOne
-    @JoinColumn(name = "id_ervicio", referencedColumnName = "id")
+    @JoinColumn(name = "id_servicio", referencedColumnName = "id")
     private Servicio id_servicio;
 
     @ManyToOne

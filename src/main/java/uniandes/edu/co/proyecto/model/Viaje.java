@@ -6,7 +6,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -16,12 +15,8 @@ public class Viaje {
     public Viaje() {;}
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "viaje_seq")
-    @SequenceGenerator(
-        name = "viaje_seq",
-        sequenceName = "viaje_SEQ",
-        allocationSize = 1
-    )
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
     private Long id;
 
     private String horaInicio;

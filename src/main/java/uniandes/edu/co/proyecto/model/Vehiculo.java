@@ -15,7 +15,8 @@ public class Vehiculo {
     public Vehiculo() {;}
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
     private Long id;
 
     private String placa;

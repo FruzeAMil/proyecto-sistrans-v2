@@ -1,5 +1,6 @@
 package uniandes.edu.co.proyecto.repositorio;
 
+import java.time.LocalDate;
 import java.util.Collection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,6 +13,7 @@ import uniandes.edu.co.proyecto.model.Servicio;
 
 public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
+    // 🔹 Basic SELECT queries
     @Query(value = "SELECT * FROM SERVICIO", nativeQuery = true)
     Collection<Servicio> darServicios();
 
@@ -27,19 +29,7 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     @Query(value = "SELECT * FROM SERVICIO WHERE fecha = :fecha", nativeQuery = true)
     Collection<Servicio> darServiciosPorFecha(@Param("fecha") String fecha);
 
-    @Modifying
-    @Transactional
-    @Query(value = "INSERT INTO SERVICIO (distancia_km, id_tarifa, tipo_servicio, fecha, costo, id_usuarioConductor, id_usuarioServicio, id_vehiculo) " +
-                   "VALUES (:distanciaKm, :idTarifa, :tipoServicio, :fecha, :costo, :idUsuarioConductor, :idUsuarioServicio, :idVehiculo)", nativeQuery = true)
-    void insertarServicio(@Param("distanciaKm") Double distanciaKm,
-                          @Param("idTarifa") Long idTarifa,
-                          @Param("tipoServicio") String tipoServicio,
-                          @Param("fecha") String fecha,
-                          @Param("costo") Double costo,
-                          @Param("idUsuarioConductor") Long idUsuarioConductor,
-                          @Param("idUsuarioServicio") Long idUsuarioServicio,
-                          @Param("idVehiculo") Long idVehiculo);
-
+    // 🔹 UPDATE (optional, keep if you need custom updates)
     @Modifying
     @Transactional
     @Query(value = "UPDATE SERVICIO SET distancia_km = :distanciaKm, id_tarifa = :idTarifa, tipo_servicio = :tipoServicio, " +
@@ -55,12 +45,13 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
                             @Param("idUsuarioServicio") Long idUsuarioServicio,
                             @Param("idVehiculo") Long idVehiculo);
 
+    // 🔹 DELETE
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM SERVICIO WHERE id = :id", nativeQuery = true)
     void eliminarServicio(@Param("id") Long id);
 
-    /* RFC1 - historial de servicios por usuario (usa el SQL del archivo RFC1 - parametrizado) */
+    // 🔹 RFC1 – historial de servicios por usuario
     @Query(value =
         "SELECT s.*, " +
         "       v.placa, v.marca, v.modelo, v.color, v.capacidadPasajeros, v.tipoVehiculo, v.nivel, " +
@@ -73,7 +64,7 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
         nativeQuery = true)
     Collection<Object[]> darHistoricoServiciosPorUsuario(@Param("idUsuario") Long idUsuario);
 
-    /* RFC4 - utilización de servicios en ciudad en rango de fechas (según archivo) */
+    // 🔹 RFC4 – utilización de servicios en ciudad en rango de fechas
     @Query(value =
         "SELECT c.nombre AS ciudad, t.tipoServicio, t.nivel, COUNT(s.idServicio) AS cantidad_servicios, " +
         "       ROUND(100.0 * COUNT(s.idServicio) / SUM(COUNT(s.idServicio)) OVER (), 2) AS porcentaje, " +
@@ -90,4 +81,26 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     Collection<Object[]> darUsoServiciosPorCiudadYRango(@Param("idCiudad") Integer idCiudad,
                                                        @Param("fechaInicio") String fechaInicio,
                                                        @Param("fechaFin") String fechaFin);
+
+    // 🔹 Optional utility (keep if needed)
+    @Query(value = "SELECT MAX(id) FROM SERVICIO", nativeQuery = true)
+    Long obtenerUltimoIdInsertado();
+
+        @Modifying
+    @Transactional
+    @Query(value = """
+        INSERT INTO servicio 
+        (distanciaKm, costo, tipoServicio, fecha, idTarifa, id_vehiculo, id_usuarioConductor, id_usuarioServicio) 
+        VALUES (:distanciaKm, :costo, :tipoServicio, :fecha, :idTarifa, :idVehiculo, :idUsuarioConductor, :idUsuarioServicio)
+        """, nativeQuery = true)
+    void insertarServicio(
+        Double distanciaKm,
+        Double costo,
+        String tipoServicio,
+        LocalDate fecha,
+        Long idTarifa,
+        Long idVehiculo,
+        Long idUsuarioConductor,
+        Long idUsuarioServicio
+    );
 }

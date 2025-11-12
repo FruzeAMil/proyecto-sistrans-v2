@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import uniandes.edu.co.proyecto.model.UsuarioServicio;
 
 public interface UsuarioServicioRepository extends JpaRepository<UsuarioServicio, Long> {
+    
 
     @Query(value = "SELECT * FROM USUARIO_SERVICIO", nativeQuery = true)
     Collection<UsuarioServicio> darUsuarios();

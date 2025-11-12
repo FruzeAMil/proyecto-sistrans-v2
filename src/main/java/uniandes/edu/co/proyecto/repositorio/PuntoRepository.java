@@ -26,26 +26,26 @@ public interface PuntoRepository extends JpaRepository<Punto, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO PUNTO (direccion, longitud, latitud, orden, id_ervicio, id_ciudad) " +
+    @Query(value = "INSERT INTO PUNTO (direccion, longitud, latitud, orden, id_servicio, id_ciudad) " +
                    "VALUES (:direccion, :longitud, :latitud, :orden, :idServicio, :idCiudad)", nativeQuery = true)
     void insertarPunto(@Param("direccion") String direccion,
                        @Param("longitud") Double longitud,
                        @Param("latitud") Double latitud,
                        @Param("orden") Integer orden,
                        @Param("idServicio") Long idServicio,
-                       @Param("idCiudad") Integer idCiudad);
+                       @Param("idCiudad") Long idCiudad);
 
     @Modifying
     @Transactional
     @Query(value = "UPDATE PUNTO SET direccion = :direccion, longitud = :longitud, latitud = :latitud, " +
-                   "orden = :orden, id_ervicio = :idServicio, id_ciudad = :idCiudad WHERE id = :id", nativeQuery = true)
+                   "orden = :orden, id_servicio = :idServicio, id_ciudad = :idCiudad WHERE id = :id", nativeQuery = true)
     void actualizarPunto(@Param("id") Long id,
                          @Param("direccion") String direccion,
                          @Param("longitud") Double longitud,
                          @Param("latitud") Double latitud,
                          @Param("orden") Integer orden,
                          @Param("idServicio") Long idServicio,
-                         @Param("idCiudad") Integer idCiudad);
+                         @Param("idCiudad") Long idCiudad);
 
     @Modifying
     @Transactional

@@ -23,7 +23,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "INSERT INTO VIAJE (hora_inicio, hora_fin, costo, id_servicio) VALUES (:horaInicio, :horaFin, :costo, :idServicio)", nativeQuery = true)
+    @Query(value = "INSERT INTO VIAJE (horaInicio, horaFin, costo, id_servicio) VALUES (:horaInicio, :horaFin, :costo, :idServicio)", nativeQuery = true)
     void insertarViaje(@Param("horaInicio") String horaInicio,
                        @Param("horaFin") String horaFin,
                        @Param("costo") double costo,
@@ -31,7 +31,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "UPDATE VIAJE SET hora_inicio = :horaInicio, hora_fin = :horaFin, costo = :costo, id_servicio = :idServicio WHERE id = :id", nativeQuery = true)
+    @Query(value = "UPDATE VIAJE SET horaInicio = :horaInicio, horaFin = :horaFin, costo = :costo, id_servicio = :idServicio WHERE id = :id", nativeQuery = true)
     void actualizarViaje(@Param("id") Long id,
                          @Param("horaInicio") String horaInicio,
                          @Param("horaFin") String horaFin,

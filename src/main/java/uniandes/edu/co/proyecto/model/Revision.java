@@ -16,7 +16,8 @@ public class Revision {
     public Revision() {;}
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    
     private Long id;
 
     @Column(nullable = false)
