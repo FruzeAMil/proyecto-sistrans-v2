@@ -3,6 +3,7 @@ package uniandes.edu.co.proyecto.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -274,6 +275,36 @@ private UsuarioServicio verificarMedioDePago(Long idUsuario) throws Exception {
     @Transactional
     public void eliminarServicio(Long id) {
         servicioRepository.eliminarServicio(id);
+    }
+
+    // RFC1 - Histórico con READ_COMMITTED
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public Collection<Object[]> consultarHistoricoReadCommitted(Long idUsuario) {
+        System.out.println("Ejecutando RFC1 con READ_COMMITTED...");
+        Collection<Object[]> primeraLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
+        try {
+            System.out.println("Esperando 30 segundos...");
+            Thread.sleep(30000); // ⏳ Espera para observar efectos concurrentes
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        Collection<Object[]> segundaLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
+        return segundaLectura;
+    }
+
+    // RFC1 - Histórico con SERIALIZABLE
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Collection<Object[]> consultarHistoricoSerializable(Long idUsuario) {
+        System.out.println("Ejecutando RFC1 con SERIALIZABLE...");
+        Collection<Object[]> primeraLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
+        try {
+            System.out.println("Esperando 30 segundos...");
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        Collection<Object[]> segundaLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
+        return segundaLectura;
     }
 
 }

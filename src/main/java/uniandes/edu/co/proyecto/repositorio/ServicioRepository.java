@@ -48,18 +48,19 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     @Query(value = "DELETE FROM SERVICIO WHERE id = :id", nativeQuery = true)
     void eliminarServicio(@Param("id") Long id);
 
-    // RFC1 – historial de servicios por usuario
-    @Query(value =
-        "SELECT s.*, " +
-        "       v.placa, v.marca, v.modelo, v.color, v.capacidadPasajeros, v.tipoVehiculo, v.nivel, " +
-        "       uc.idUsuarioConductor, u.nombre AS nombreConductor, u.cedula AS cedulaConductor, u.correo AS correoConductor, u.celular AS celularConductor " +
-        "FROM Servicio s " +
-        "INNER JOIN Usuario_Servicio us ON s.idUsuarioServicio = us.idUsuarioServicio " +
-        "INNER JOIN Usuario_Conductor uc ON s.idUsuarioConductor = uc.idUsuarioConductor " +
-        "INNER JOIN Usuario u ON uc.idUsuario = u.idUsuario " +
-        "INNER JOIN Vehiculo v ON s.idVehiculo = v.idVehiculo ",
-        nativeQuery = true)
-    Collection<Object[]> darHistoricoServiciosPorUsuario(@Param("idUsuario") Long idUsuario);
+    // RFC1 - historico por usuario
+    @Query(value = """
+        SELECT s.id, s.fecha, s.tipoServicio, s.costo,
+            uc.nombre AS nombreConductor, us.nombre AS nombreUsuario,
+            v.placa, v.marca, v.modelo, v.nivel
+        FROM SERVICIO s
+        JOIN USUARIO_CONDUCTOR uc ON s.id_usuarioConductor = uc.id
+        JOIN USUARIO_SERVICIO us ON s.id_usuarioServicio = us.id
+        JOIN VEHICULO v ON s.id_vehiculo = v.id
+        WHERE s.id_usuarioServicio = :idUsuario
+        """, nativeQuery = true)
+    Collection<Object[]> consultarHistoricoPorUsuario(@Param("idUsuario") Long idUsuario);
+
 
     // RFC4 – utilización de servicios en ciudad en rango de fechas
     @Query(value =

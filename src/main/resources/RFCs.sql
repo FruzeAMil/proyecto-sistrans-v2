@@ -50,7 +50,7 @@ SELECT
     v.modelo,
     COUNT(s.id) AS total_servicios,
     SUM(s.costo) AS total_bruto,
-    SUM(s.costo * 0.9) AS total_neto -- después de la comisión del 10%
+    SUM(s.costo * 0.9) AS total_neto
 FROM SERVICIO s
 JOIN VEHICULO v ON s.id_vehiculo = v.id
 JOIN USUARIO_CONDUCTOR uc ON v.id_usuarioConductor = uc.id

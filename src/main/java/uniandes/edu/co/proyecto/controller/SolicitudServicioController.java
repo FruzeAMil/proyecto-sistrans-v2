@@ -1,5 +1,7 @@
 package uniandes.edu.co.proyecto.controller;
 
+import java.util.Collection;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,6 +66,16 @@ public class SolicitudServicioController {
                 .status(HttpStatus.BAD_REQUEST)
                 .body("✗ Error al eliminar servicio: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/rfc1/read-committed/{idUsuario}")
+    public ResponseEntity<Collection<Object[]>> consultarHistoricoReadCommitted(@PathVariable Long idUsuario) {
+        return ResponseEntity.ok(solicitudServicioService.consultarHistoricoReadCommitted(idUsuario));
+    }
+
+    @GetMapping("/rfc1/serializable/{idUsuario}")
+    public ResponseEntity<Collection<Object[]>> consultarHistoricoSerializable(@PathVariable Long idUsuario) {
+        return ResponseEntity.ok(solicitudServicioService.consultarHistoricoSerializable(idUsuario));
     }
 
     
