@@ -247,4 +247,33 @@ private UsuarioServicio verificarMedioDePago(Long idUsuario) throws Exception {
             idServicio
         );
     }
+   @Transactional
+    public void actualizarServicio(Long id, SolicitudServicioDTO solicitud) {
+        Double distanciaKm = 10.5;
+        Long idTarifa = 1L;
+        String tipoServicio = solicitud.getTipoServicio();
+        String fecha = LocalDate.now().toString();
+        Double costo = 35000.0;
+        Long idUsuarioConductor = 2L;
+        Long idUsuarioServicio = solicitud.getIdUsuarioServicio();
+        Long idVehiculo = 3L;
+
+        servicioRepository.actualizarServicio(
+            id,
+            distanciaKm,
+            idTarifa,
+            tipoServicio,
+            fecha,
+            costo,
+            idUsuarioConductor,
+            idUsuarioServicio,
+            idVehiculo
+        );
+    }
+
+    @Transactional
+    public void eliminarServicio(Long id) {
+        servicioRepository.eliminarServicio(id);
+    }
+
 }

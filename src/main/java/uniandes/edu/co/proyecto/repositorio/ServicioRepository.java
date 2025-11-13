@@ -13,7 +13,6 @@ import uniandes.edu.co.proyecto.model.Servicio;
 
 public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
-    // 🔹 Basic SELECT queries
     @Query(value = "SELECT * FROM SERVICIO", nativeQuery = true)
     Collection<Servicio> darServicios();
 
@@ -29,10 +28,9 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     @Query(value = "SELECT * FROM SERVICIO WHERE fecha = :fecha", nativeQuery = true)
     Collection<Servicio> darServiciosPorFecha(@Param("fecha") String fecha);
 
-    // 🔹 UPDATE (optional, keep if you need custom updates)
     @Modifying
     @Transactional
-    @Query(value = "UPDATE SERVICIO SET distancia_km = :distanciaKm, id_tarifa = :idTarifa, tipo_servicio = :tipoServicio, " +
+    @Query(value = "UPDATE SERVICIO SET distanciaKm = :distanciaKm, idTarifa = :idTarifa, tipoServicio = :tipoServicio, " +
                    "fecha = :fecha, costo = :costo, id_usuarioConductor = :idUsuarioConductor, id_usuarioServicio = :idUsuarioServicio, id_vehiculo = :idVehiculo " +
                    "WHERE id = :id", nativeQuery = true)
     void actualizarServicio(@Param("id") Long id,
@@ -45,13 +43,12 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
                             @Param("idUsuarioServicio") Long idUsuarioServicio,
                             @Param("idVehiculo") Long idVehiculo);
 
-    // 🔹 DELETE
     @Modifying
     @Transactional
     @Query(value = "DELETE FROM SERVICIO WHERE id = :id", nativeQuery = true)
     void eliminarServicio(@Param("id") Long id);
 
-    // 🔹 RFC1 – historial de servicios por usuario
+    // RFC1 – historial de servicios por usuario
     @Query(value =
         "SELECT s.*, " +
         "       v.placa, v.marca, v.modelo, v.color, v.capacidadPasajeros, v.tipoVehiculo, v.nivel, " +
@@ -64,7 +61,7 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
         nativeQuery = true)
     Collection<Object[]> darHistoricoServiciosPorUsuario(@Param("idUsuario") Long idUsuario);
 
-    // 🔹 RFC4 – utilización de servicios en ciudad en rango de fechas
+    // RFC4 – utilización de servicios en ciudad en rango de fechas
     @Query(value =
         "SELECT c.nombre AS ciudad, t.tipoServicio, t.nivel, COUNT(s.idServicio) AS cantidad_servicios, " +
         "       ROUND(100.0 * COUNT(s.idServicio) / SUM(COUNT(s.idServicio)) OVER (), 2) AS porcentaje, " +
@@ -82,7 +79,6 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
                                                        @Param("fechaInicio") String fechaInicio,
                                                        @Param("fechaFin") String fechaFin);
 
-    // 🔹 Optional utility (keep if needed)
     @Query(value = "SELECT MAX(id) FROM SERVICIO", nativeQuery = true)
     Long obtenerUltimoIdInsertado();
 
