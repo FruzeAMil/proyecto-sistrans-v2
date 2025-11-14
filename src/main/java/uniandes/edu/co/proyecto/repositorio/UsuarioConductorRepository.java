@@ -30,6 +30,7 @@ public interface UsuarioConductorRepository extends JpaRepository<UsuarioConduct
 
     boolean existsByCorreo(String correo);
 
+    // RF3 - Registrar un usuario conductor
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO USUARIO_CONDUCTOR (cedula, nombre, correo, celular, calificacion) " +
@@ -57,31 +58,42 @@ public interface UsuarioConductorRepository extends JpaRepository<UsuarioConduct
     void eliminarConductor(@Param("id") Long id);
 
     /* RFC2 - top 20 conductores que más servicios han prestado */
-    @Query(value =
-        "SELECT uc.idUsuarioConductor, u.nombre, u.cedula, u.correo, u.celular, COUNT(s.idServicio) AS q_servicios " +
-        "FROM Usuario_Conductor uc " +
-        "INNER JOIN Usuario u ON uc.idUsuario = u.idUsuario " +
-        "LEFT JOIN Servicio s ON s.idUsuarioConductor = uc.idUsuarioConductor " +
-        "GROUP BY uc.idUsuarioConductor, u.nombre, u.cedula, u.correo, u.celular " +
-        "ORDER BY q_servicios DESC " +
-        "FETCH FIRST 20 ROWS ONLY",
-        nativeQuery = true)
+    @Query(value = """
+        SELECT 
+            uc.id AS id_conductor,
+            uc.nombre,
+            uc.cedula,
+            uc.correo,
+            COUNT(s.id) AS total_servicios
+        FROM USUARIO_CONDUCTOR uc
+        JOIN SERVICIO s ON uc.id = s.id_usuarioConductor
+        GROUP BY uc.id, uc.nombre, uc.cedula, uc.correo
+        ORDER BY total_servicios DESC
+        FETCH FIRST 20 ROWS ONLY
+        """, nativeQuery = true)
     Collection<Object[]> darTop20ConductoresMasServicios();
     
-    /* RFC3 - ganancias por conductor por vehículo discriminado por servicio (filtrable por conductor) */
-    @Query(value =
-        "SELECT uc.idUsuarioConductor, v.idVehiculo, v.placa, v.marca, v.modelo, " +
-        "       COUNT(s.idServicio) AS cantidad_servicios, SUM(s.costoTotal) AS valor_total_servicios, SUM(s.costoTotal) * 0.6 AS valor_neto_conductor " +
-        "FROM Usuario_Conductor uc " +
-        "INNER JOIN Vehiculo v ON v.idUsuarioConductor = uc.idUsuarioConductor " +
-        "INNER JOIN Servicio s ON s.idVehiculo = v.idVehiculo AND s.idUsuarioConductor = uc.idUsuarioConductor " +
-        "WHERE uc.idUsuarioConductor = :idConductor " +
-        "GROUP BY uc.idUsuarioConductor, v.idVehiculo, v.placa, v.marca, v.modelo " +
-        "ORDER BY uc.idUsuarioConductor, v.idVehiculo",
-        nativeQuery = true)
-    Collection<Object[]> darGananciasPorConductorVehiculoPorServicio(@Param("idConductor") Long idConductor);
+    /* RFC3 - ganancias por conductor por vehículo discriminado por servicio */
+    @Query(value = """
+        SELECT 
+            uc.id AS id_conductor,
+            uc.nombre AS nombre_conductor,
+            v.id AS id_vehiculo,
+            v.placa,
+            v.marca,
+            v.modelo,
+            COUNT(s.id) AS total_servicios,
+            SUM(s.costo) AS total_bruto,
+            SUM(s.costo * 0.9) AS total_neto
+        FROM SERVICIO s
+        JOIN VEHICULO v ON s.id_vehiculo = v.id
+        JOIN USUARIO_CONDUCTOR uc ON v.id_usuarioConductor = uc.id
+        GROUP BY uc.id, uc.nombre, v.id, v.placa, v.marca, v.modelo
+        ORDER BY uc.id, v.id
+        """, nativeQuery = true)
+    Collection<Object[]> darGananciasPorConductorVehiculoPorServicio();
 
-    // Buscar conductor disponible cerca de una ubicación
+    // RF8 - Buscar conductor disponible cerca de una ubicación para asignar servicio
     @Query(value = "SELECT uc.* FROM USUARIO_CONDUCTOR uc " +
                    "INNER JOIN VEHICULO v ON uc.id = v.id_usuarioConductor " +
                    "WHERE uc.estado = 'DISPONIBLE' " +
@@ -91,13 +103,13 @@ public interface UsuarioConductorRepository extends JpaRepository<UsuarioConduct
            nativeQuery = true)
     Optional<UsuarioConductor> buscarConductorDisponible(@Param("nivelServicio") String nivelServicio);
 
-    // Actualizar estado del conductor
+    // RF8 - Actualizar estado del conductor (DISPONIBLE/OCUPADO)
     @Modifying
     @Transactional
     @Query(value = "UPDATE USUARIO_CONDUCTOR SET estado = :estado WHERE id = :id", nativeQuery = true)
     void actualizarEstado(@Param("id") Long id, @Param("estado") String estado);
     
-    // Verificar si el conductor está disponible
+    // RF8 - Verificar si el conductor está disponible
     @Query(value = "SELECT COUNT(*) FROM USUARIO_CONDUCTOR WHERE id = :id AND estado = 'DISPONIBLE'", 
            nativeQuery = true)
     int verificarDisponibilidad(@Param("id") Long id);

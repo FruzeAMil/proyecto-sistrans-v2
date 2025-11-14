@@ -21,9 +21,10 @@ public interface PuntoRepository extends JpaRepository<Punto, Long> {
     @Query(value = "SELECT * FROM PUNTO WHERE id_ciudad = :idCiudad", nativeQuery = true)
     Collection<Punto> darPuntosPorCiudad(@Param("idCiudad") Integer idCiudad);
 
-    @Query(value = "SELECT * FROM PUNTO WHERE id_ervicio = :idServicio", nativeQuery = true)
+    @Query(value = "SELECT * FROM PUNTO WHERE id_servicio = :idServicio", nativeQuery = true)
     Collection<Punto> darPuntosPorServicio(@Param("idServicio") Long idServicio);
 
+    // RF7 - Registrar un punto geográfico
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO PUNTO (direccion, longitud, latitud, orden, id_servicio, id_ciudad) " +

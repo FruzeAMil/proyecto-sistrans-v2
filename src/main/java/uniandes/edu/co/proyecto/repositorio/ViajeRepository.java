@@ -21,6 +21,7 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
     @Query(value = "SELECT * FROM VIAJE WHERE id_servicio = :idServicio", nativeQuery = true)
     Collection<Viaje> darViajesPorServicio(@Param("idServicio") Long idServicio);
 
+    // RF8 - Registrar el inicio del viaje
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO VIAJE (horaInicio, horaFin, costo, id_servicio) VALUES (:horaInicio, :horaFin, :costo, :idServicio)", nativeQuery = true)
@@ -42,4 +43,14 @@ public interface ViajeRepository extends JpaRepository<Viaje, Long> {
     @Transactional
     @Query(value = "DELETE FROM VIAJE WHERE id = :id", nativeQuery = true)
     void eliminarViaje(@Param("id") Long id);
+
+    // RF9 - Registrar el final de un viaje
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE VIAJE SET horaFin = :horaFin WHERE id_servicio = :idServicio", nativeQuery = true)
+    void finalizarViaje(@Param("idServicio") Long idServicio, @Param("horaFin") String horaFin);
+
+    // RF9 - Obtener viaje por servicio para actualización
+    @Query(value = "SELECT * FROM VIAJE WHERE id_servicio = :idServicio", nativeQuery = true)
+    Viaje darViajePorServicio(@Param("idServicio") Long idServicio);
 }

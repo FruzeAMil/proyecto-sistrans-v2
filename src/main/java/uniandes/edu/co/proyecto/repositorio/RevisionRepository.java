@@ -21,6 +21,8 @@ public interface RevisionRepository extends JpaRepository<Revision, Long> {
     @Query(value = "SELECT * FROM REVISION WHERE id_servicio = :idServicio", nativeQuery = true)
     Collection<Revision> darRevisionesPorServicio(@Param("idServicio") Long idServicio);
 
+    // RF10 - Dejar una revisión por parte del usuario de servicios (pasajero califica a conductor)
+    // RF11 - Dejar una revisión por parte de un usuario conductor (conductor califica a pasajero)
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO REVISION (calificacion, comentario, id_servicio) VALUES (:calificacion, :comentario, :idServicio)", nativeQuery = true)

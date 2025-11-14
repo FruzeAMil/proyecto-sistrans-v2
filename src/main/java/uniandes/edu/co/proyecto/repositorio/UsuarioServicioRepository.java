@@ -30,6 +30,7 @@ public interface UsuarioServicioRepository extends JpaRepository<UsuarioServicio
 
     boolean existsByCorreo(String correo);
 
+    // RF2 - Registrar un usuario de servicios
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO USUARIO_SERVICIO (cedula, nombre, correo, celular, calificacion, num_tarjeta, nombre_tarjeta, vencimiento, codigo_seguridad) " +
@@ -64,4 +65,8 @@ public interface UsuarioServicioRepository extends JpaRepository<UsuarioServicio
     @Transactional
     @Query(value = "DELETE FROM USUARIO_SERVICIO WHERE id = :id", nativeQuery = true)
     void eliminarUsuario(@Param("id") Long id);
+
+    // RF8 - Verificar que el usuario tiene un medio de pago registrado
+    @Query(value = "SELECT COUNT(*) FROM USUARIO_SERVICIO WHERE id = :id AND num_tarjeta IS NOT NULL", nativeQuery = true)
+    int verificarMedioDePago(@Param("id") Long id);
 }

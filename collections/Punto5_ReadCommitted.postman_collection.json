@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "concurrencia-punto5-2024",
+		"name": "ALPESCAB - Punto 5 READ COMMITTED",
+		"description": "Colección para probar el escenario de concurrencia con nivel de aislamiento READ COMMITTED (Punto 5)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. RFC1 - READ COMMITTED (30s)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/servicios/rfc1/readcommitted/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"servicios",
+						"rfc1",
+						"readcommitted",
+						"1"
+					]
+				},
+				"description": "**EJECUTAR PRIMERO - PUNTO 5**\n\nNivel de aislamiento: READ COMMITTED\n\n⏱️ Tardará 30 segundos\n\n✅ Resultado esperado:\n- cantidadPrimera: 5 (o el número actual de servicios)\n- cantidadSegunda: 6 (uno más que la primera)\n\nLa segunda lectura SÍ debe ver el nuevo servicio insertado por RF8"
+			},
+			"response": []
+		},
+		{
+			"name": "2. RF8 - Solicitar Servicio (ejecutar 5s después)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUsuarioServicio\": 1,\n    \"idCiudad\": 1,\n    \"tipoServicio\": \"ESTANDAR\",\n    \"direccionPartida\": \"Carrera 7 #100-50, Bogota\",\n    \"longitudPartida\": -74.05,\n    \"latitudPartida\": 4.68,\n    \"direccionLlegada\": \"Calle 26 #68-90, Bogota\",\n    \"longitudLlegada\": -74.09,\n    \"latitudLlegada\": 4.64,\n    \"idTarifa\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/servicios/solicitar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"servicios",
+						"solicitar"
+					]
+				},
+				"description": "**EJECUTAR 5 SEGUNDOS DESPUÉS DE RFC1**\n\nInserta un nuevo servicio mientras RFC1 está esperando.\n\n✅ Respuesta inmediata:\n\"✓ Servicio solicitado exitosamente. ID del servicio: XXXX\""
+			},
+			"response": []
+		}
+	]
+}

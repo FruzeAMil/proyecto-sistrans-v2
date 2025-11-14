@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -277,24 +279,9 @@ private UsuarioServicio verificarMedioDePago(Long idUsuario) throws Exception {
         servicioRepository.eliminarServicio(id);
     }
 
-    // RFC1 - Histórico con READ_COMMITTED
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public Collection<Object[]> consultarHistoricoReadCommitted(Long idUsuario) {
-        System.out.println("Ejecutando RFC1 con READ_COMMITTED...");
-        Collection<Object[]> primeraLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
-        try {
-            System.out.println("Esperando 30 segundos...");
-            Thread.sleep(30000); // ⏳ Espera para observar efectos concurrentes
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
-        Collection<Object[]> segundaLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
-        return segundaLectura;
-    }
-
     // RFC1 - Histórico con SERIALIZABLE
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public Collection<Object[]> consultarHistoricoSerializable(Long idUsuario) {
+    public Map<String, Object> consultarHistoricoSerializable(Long idUsuario) {
         System.out.println("Ejecutando RFC1 con SERIALIZABLE...");
         Collection<Object[]> primeraLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
         try {
@@ -304,7 +291,59 @@ private UsuarioServicio verificarMedioDePago(Long idUsuario) throws Exception {
             Thread.currentThread().interrupt();
         }
         Collection<Object[]> segundaLectura = servicioRepository.consultarHistoricoPorUsuario(idUsuario);
-        return segundaLectura;
+        
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("primeraConsulta", primeraLectura);
+        resultado.put("segundaConsulta", segundaLectura);
+        resultado.put("cantidadPrimera", primeraLectura.size());
+        resultado.put("cantidadSegunda", segundaLectura.size());
+        
+        return resultado;
+    }
+
+    // RFC1 - Histórico con READ COMMITTED
+    // RFC1 - Histórico con READ COMMITTED
+    // En Oracle, READ COMMITTED permite ver cambios confirmados entre consultas
+    // pero cada consulta debe estar en transacciones separadas
+    public Map<String, Object> consultarHistoricoReadCommitted(Long idUsuario) {
+        System.out.println("Ejecutando RFC1 con READ COMMITTED...");
+        
+        // Primera lectura
+        Collection<Object[]> primeraLectura = ejecutarConsultaReadCommitted(idUsuario);
+        System.out.println("Primera lectura: " + primeraLectura.size() + " servicios");
+        
+        try {
+            System.out.println("Esperando 30 segundos...");
+            Thread.sleep(30000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        
+        // Segunda lectura (debería ver nuevos servicios confirmados)
+        Collection<Object[]> segundaLectura = ejecutarConsultaReadCommitted(idUsuario);
+        System.out.println("Segunda lectura: " + segundaLectura.size() + " servicios");
+        
+        Map<String, Object> resultado = new HashMap<>();
+        resultado.put("primeraConsulta", primeraLectura);
+        resultado.put("segundaConsulta", segundaLectura);
+        resultado.put("cantidadPrimera", primeraLectura.size());
+        resultado.put("cantidadSegunda", segundaLectura.size());
+        
+        if (segundaLectura.size() > primeraLectura.size()) {
+            System.out.println("READ COMMITTED funcionó: segunda lectura vio " + 
+                (segundaLectura.size() - primeraLectura.size()) + " servicios nuevos");
+        } else {
+            System.out.println("ADVERTENCIA: Las cantidades son iguales - puede ser problema de caché");
+        }
+        
+        return resultado;
+    }
+    
+    // Método auxiliar - cada invocación crea una nueva transacción
+    @Transactional(isolation = Isolation.READ_COMMITTED, propagation = org.springframework.transaction.annotation.Propagation.REQUIRES_NEW)
+    public Collection<Object[]> ejecutarConsultaReadCommitted(Long idUsuario) {
+        System.out.println("Ejecutando consulta en nueva transacción READ_COMMITTED");
+        return servicioRepository.consultarHistoricoPorUsuario(idUsuario);
     }
 
 }

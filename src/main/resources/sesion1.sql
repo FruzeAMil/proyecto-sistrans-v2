@@ -1,0 +1,14 @@
+-- -- Sesion 1: RFC1 con READ COMMITTED
+
+-- -- Primera consulta
+-- SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+-- SELECT COUNT(*) FROM SERVICIO WHERE id_usuarioServicio = 1;
+-- COMMIT;
+
+-- PAUSE
+
+-- -- Segunda consulta
+-- SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+-- SELECT COUNT(*) FROM SERVICIO WHERE id_usuarioServicio = 1;
+-- COMMIT;
+

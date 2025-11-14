@@ -1,6 +1,6 @@
 package uniandes.edu.co.proyecto.controller;
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,14 +68,14 @@ public class SolicitudServicioController {
         }
     }
 
-    @GetMapping("/rfc1/read-committed/{idUsuario}")
-    public ResponseEntity<Collection<Object[]>> consultarHistoricoReadCommitted(@PathVariable Long idUsuario) {
-        return ResponseEntity.ok(solicitudServicioService.consultarHistoricoReadCommitted(idUsuario));
+    @GetMapping("/rfc1/serializable/{idUsuario}")
+    public ResponseEntity<Map<String, Object>> consultarHistoricoSerializable(@PathVariable Long idUsuario) {
+        return ResponseEntity.ok(solicitudServicioService.consultarHistoricoSerializable(idUsuario));
     }
 
-    @GetMapping("/rfc1/serializable/{idUsuario}")
-    public ResponseEntity<Collection<Object[]>> consultarHistoricoSerializable(@PathVariable Long idUsuario) {
-        return ResponseEntity.ok(solicitudServicioService.consultarHistoricoSerializable(idUsuario));
+    @GetMapping("/rfc1/readcommitted/{idUsuario}")
+    public ResponseEntity<Map<String, Object>> consultarHistoricoReadCommitted(@PathVariable Long idUsuario) {
+        return ResponseEntity.ok(solicitudServicioService.consultarHistoricoReadCommitted(idUsuario));
     }
 
     

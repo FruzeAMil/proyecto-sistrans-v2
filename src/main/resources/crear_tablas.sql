@@ -163,3 +163,13 @@ COMMIT;
 SELECT COLUMN_NAME, GENERATION_TYPE
 FROM USER_TAB_IDENTITY_COLS
 WHERE TABLE_NAME = 'SERVICIO';
+
+
+SELECT id, nombre, numTarjeta FROM USUARIO_SERVICIO WHERE id = 1;
+
+SELECT uc.id, uc.nombre, uc.estado, v.id as vehiculo_id, v.nivel, v.placa
+FROM USUARIO_CONDUCTOR uc
+LEFT JOIN VEHICULO v ON uc.id = v.id_usuarioConductor
+WHERE uc.estado = 'DISPONIBLE';
+
+SELECT * FROM CIUDAD WHERE id = 1;

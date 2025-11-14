@@ -27,6 +27,7 @@ public interface VehiculoRepository extends JpaRepository<Vehiculo, Long> {
 
     boolean existsByPlaca(String placa);
 
+    // RF4 - Registrar un vehículo para un usuario conductor
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO VEHICULO (placa, marca, modelo, capacidad_pasajeros, nivel, id_usuarioConductor) " +

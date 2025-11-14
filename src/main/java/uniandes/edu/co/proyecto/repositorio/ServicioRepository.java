@@ -63,21 +63,32 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
 
     // RFC4 – utilización de servicios en ciudad en rango de fechas
-    @Query(value =
-        "SELECT c.nombre AS ciudad, t.tipoServicio, t.nivel, COUNT(s.idServicio) AS cantidad_servicios, " +
-        "       ROUND(100.0 * COUNT(s.idServicio) / SUM(COUNT(s.idServicio)) OVER (), 2) AS porcentaje, " +
-        "       SUM(s.costoTotal) AS valor_total " +
-        "FROM Servicio s " +
-        "INNER JOIN Vehiculo v ON s.idVehiculo = v.idVehiculo " +
-        "INNER JOIN Ciudad c ON v.idCiudadExpedicion = c.idCiudad " +
-        "INNER JOIN Tarifa t ON s.idTarifa = t.idTarifa " +
-        "WHERE c.idCiudad = :idCiudad " +
-        "  AND s.fechaInicio BETWEEN :fechaInicio AND :fechaFin " +
-        "GROUP BY c.nombre, t.tipoServicio, t.nivel " +
-        "ORDER BY cantidad_servicios DESC",
-        nativeQuery = true)
-    Collection<Object[]> darUsoServiciosPorCiudadYRango(@Param("idCiudad") Integer idCiudad,
-                                                       @Param("fechaInicio") String fechaInicio,
+    @Query(value = """
+        SELECT 
+            c.id AS id_ciudad,
+            c.nombre AS ciudad,
+            s.tipoServicio,
+            COUNT(s.id) AS cantidad_servicios,
+            ROUND(
+                COUNT(s.id) * 100 /
+                (
+                    SELECT COUNT(*)
+                    FROM SERVICIO s2
+                    JOIN PUNTO p2 ON s2.id = p2.id_servicio
+                    WHERE p2.id_ciudad = c.id
+                      AND s2.fecha BETWEEN TO_DATE(:fechaInicio, 'YYYY-MM-DD') 
+                                       AND TO_DATE(:fechaFin, 'YYYY-MM-DD')
+                )
+            , 2) AS porcentaje
+        FROM SERVICIO s
+        JOIN PUNTO p ON s.id = p.id_servicio
+        JOIN CIUDAD c ON p.id_ciudad = c.id
+        WHERE s.fecha BETWEEN TO_DATE(:fechaInicio, 'YYYY-MM-DD') 
+                          AND TO_DATE(:fechaFin, 'YYYY-MM-DD')
+        GROUP BY c.id, c.nombre, s.tipoServicio
+        ORDER BY cantidad_servicios DESC
+        """, nativeQuery = true)
+    Collection<Object[]> darUsoServiciosPorCiudadYRango(@Param("fechaInicio") String fechaInicio,
                                                        @Param("fechaFin") String fechaFin);
 
     @Query(value = "SELECT MAX(id) FROM SERVICIO", nativeQuery = true)

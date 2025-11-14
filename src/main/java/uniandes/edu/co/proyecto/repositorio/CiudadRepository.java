@@ -18,6 +18,7 @@ public interface CiudadRepository extends JpaRepository<Ciudad, Integer> {
     @Query(value = "SELECT * FROM CIUDAD WHERE id = :id", nativeQuery = true)
     Ciudad darCiudad(@Param("id") Integer id);
 
+    // RF1 - Registrar una ciudad
     @Modifying
     @Transactional
     @Query(value = "INSERT INTO CIUDAD (nombre) VALUES (:nombre)", nativeQuery = true)

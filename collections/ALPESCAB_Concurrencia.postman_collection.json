@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "concurrencia-sistrans-2024",
+		"name": "ALPESCAB - Prueba Concurrencia RFC1 vs RF8",
+		"description": "Colección para probar el escenario de concurrencia con nivel de aislamiento SERIALIZABLE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. RFC1 - Consulta Histórico SERIALIZABLE (30s)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/api/servicios/rfc1/serializable/1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"servicios",
+						"rfc1",
+						"serializable",
+						"1"
+					]
+				},
+				"description": "**EJECUTAR PRIMERO**\n\nEste endpoint realiza 2 consultas con nivel de aislamiento SERIALIZABLE:\n1. Primera consulta del histórico\n2. Espera 30 segundos\n3. Segunda consulta del histórico\n\n⏱️ **Tardará 30 segundos en responder**\n\n✅ **Resultado esperado:** Ambas consultas deben mostrar la misma cantidad de servicios, aunque RF8 inserte uno nuevo durante la ejecución."
+			},
+			"response": []
+		},
+		{
+			"name": "2. RF8 - Solicitar Servicio (ejecutar 5s después)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idUsuarioServicio\": 1,\n    \"idCiudad\": 1,\n    \"tipoServicio\": \"ESTANDAR\",\n    \"direccionPartida\": \"Carrera 7 #100-50, Bogota\",\n    \"longitudPartida\": -74.05,\n    \"latitudPartida\": 4.68,\n    \"direccionLlegada\": \"Calle 26 #68-90, Bogota\",\n    \"longitudLlegada\": -74.09,\n    \"latitudLlegada\": 4.64,\n    \"idTarifa\": 1\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/servicios/solicitar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"servicios",
+						"solicitar"
+					]
+				},
+				"description": "**EJECUTAR 5 SEGUNDOS DESPUÉS DE RFC1**\n\nEste endpoint inserta un nuevo servicio en la base de datos.\n\n⏱️ **Timing:** Ejecutar mientras RFC1 está esperando (entre los 30 segundos)\n\n✅ **Resultado esperado:** Mensaje de éxito con el ID del servicio creado"
+			},
+			"response": []
+		}
+	]
+}
