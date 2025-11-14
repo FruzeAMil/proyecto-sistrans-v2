@@ -38,9 +38,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}servicios/solicitar",
+					"raw": "http://localhost:8080/api/servicios/solicitar",
 					"host": [
-						"{{base_url}}servicios"
+						"http://localhost:8080/api/servicios"
 					],
 					"path": [
 						"solicitar"
@@ -64,9 +64,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}servicios/solicitar",
+							"raw": "http://localhost:8080/api/servicios/solicitar",
 							"host": [
-								"{{base_url}}servicios"
+								"http://localhost:8080/api/servicios"
 							],
 							"path": [
 								"solicitar"
@@ -101,9 +101,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{base_url}}servicios/solicitar",
+					"raw": "http://localhost:8080/api/servicios/solicitar",
 					"host": [
-						"{{base_url}}servicios"
+						"http://localhost:8080/api/servicios"
 					],
 					"path": [
 						"solicitar"
@@ -118,9 +118,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}servicios/solicitar",
+							"raw": "http://localhost:8080/api/servicios/solicitar",
 							"host": [
-								"{{base_url}}servicios"
+								"http://localhost:8080/api/servicios"
 							],
 							"path": [
 								"solicitar"
@@ -165,9 +165,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}servicios/actualizar/1",
+					"raw": "http://localhost:8080/api/servicios/actualizar/1",
 					"host": [
-						"{{base_url}}servicios"
+						"http://localhost:8080/api/servicios"
 					],
 					"path": [
 						"actualizar",
@@ -192,9 +192,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}servicios/actualizar/1",
+							"raw": "http://localhost:8080/api/servicios/actualizar/1",
 							"host": [
-								"{{base_url}}servicios"
+								"http://localhost:8080/api/servicios"
 							],
 							"path": [
 								"actualizar",
@@ -240,9 +240,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{base_url}}servicios/eliminar/1",
+					"raw": "http://localhost:8080/api/servicios/eliminar/1",
 					"host": [
-						"{{base_url}}servicios"
+						"http://localhost:8080/api/servicios"
 					],
 					"path": [
 						"eliminar",
@@ -267,9 +267,9 @@
 							}
 						},
 						"url": {
-							"raw": "{{base_url}}servicios/eliminar/1",
+							"raw": "http://localhost:8080/api/servicios/eliminar/1",
 							"host": [
-								"{{base_url}}servicios"
+								"http://localhost:8080/api/servicios"
 							],
 							"path": [
 								"eliminar",
